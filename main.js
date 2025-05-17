@@ -159,6 +159,80 @@ function z(s, b, i) {
     productionTick(dt);
     requestAnimationFrame(gameLoop);
   }
+
+// --- Options Menu Logic ---
+let deleteClickCount = 0;
+let optionsMenuContent = "";
+
+function saveGame() {
+  localStorage.setItem("incremental-game-save", JSON.stringify({
+    mainNumber,
+    gen1,
+    // add other game state here as needed
+  }));
+  showOptionsMessage("Game saved!");
+}
+
+function deleteSave() {
+  localStorage.removeItem("incremental-game-save");
+  // Optionally reset game state here
+  showOptionsMessage("Save deleted!");
+}
+
+function showOptionsMessage(msg) {
+  const msgElem = document.getElementById("options-message");
+  if (msgElem) msgElem.textContent = msg;
+  setTimeout(() => {
+    if (msgElem) msgElem.textContent = "";
+  }, 2000);
+}
+
+function renderOptionsMenu() {
+  optionsMenuContent = `
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1em;">
+      <button id="save-game-btn">Save Game</button>
+      <button id="delete-save-btn">Delete Save (Click 50 times)</button>
+      <span id="options-message" style="color:#ff9800;font-weight:bold;"></span>
+      <span id="delete-progress" style="font-size:0.9em;color:#ccc;"></span>
+    </div>
+  `;
+  menuContent.innerHTML = optionsMenuContent;
+
+  document.getElementById("save-game-btn").onclick = () => {
+    saveGame();
+  };
+
+  const deleteBtn = document.getElementById("delete-save-btn");
+  const progressElem = document.getElementById("delete-progress");
+  deleteClickCount = 0;
+  progressElem.textContent = "";
+
+  deleteBtn.onclick = () => {
+    deleteClickCount++;
+    progressElem.textContent = `Delete clicks: ${deleteClickCount}/50`;
+    if (deleteClickCount >= 50) {
+      deleteSave();
+      deleteClickCount = 0;
+      progressElem.textContent = "";
+    }
+  };
+}
+
+// In your menu button logic:
+menuButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelector("#menu-selection .menu-btn.selected").classList.remove("selected");
+    btn.classList.add("selected");
+    currentMenu = btn.textContent;
+    if (currentMenu === "Generators") {
+      renderGeneratorsMenu();
+    } else if (currentMenu === "Options") {
+      renderOptionsMenu();
+    } else {
+      menuContent.innerHTML = "";
+    }
+  });
+});
   gameLoop();
   
   // --- Initial UI ---
