@@ -1,182 +1,56 @@
-// --- Formulas ---
-function z(s, b, i) {
-    return Math.floor((s - b) / i);
-  }
-  function f(x, b, i, h, s) {
-    const zVal = z(s, b, i);
-    if (x <= zVal) {
-      return b + i * x;
-    } else {
-      const delta = x - zVal;
-      return b + i * x + h * ((delta ** 2 + delta) / 2);
-    }
-  }
-  function gc(x, i) {
-    const b = ((i - 1) ** 2 + i - 1) / 2;
-    const inc = Math.floor(3 + (i ** 2) / 4);
-    const h = 1;
-    const s = 1024 * Math.log10(2);
-    const floorX10 = Math.floor(x / 10);
-    return Math.pow(10, f(floorX10, b, inc, h, s));
-  }
-  // --- Game State ---
-  let mainNumber = new MegaNumber(1, 0, 0); // Start at 1
-  
-  // Generator 1 state
-  let gen1 = {
-    amount: new MegaNumber(0, 0, 0), // Amount owned (MegaNumber)
-    ab: 0, // Amount bought (integer)
-    multiplier: new MegaNumber(1, 0, 0)
-  };
-  
-  // --- DOM references ---
-  const newsMessages = [
-    "Welcome to the incremental game!",
-    "Tip: Unlock new menus by progressing!",
-    "Did you know? The numbers can become astronomical!",
-    "Try to reach 10^100 next!",
-    "Check out the Statistics menu for your progress.",
-  ];
-  let newsIndex = 0;
-  
-  function updateNewsTicker() {
-    const newsElem = document.getElementById("news-message");
-    newsElem.textContent = newsMessages[newsIndex];
-    newsIndex = (newsIndex + 1) % newsMessages.length;
-  }
-  setInterval(updateNewsTicker, 3500);
-  updateNewsTicker();
-  
-  const leftStringElem = document.getElementById("left-string");
-  const mainNumberElem = document.getElementById("main-number");
-  
-  function updateMainNumber() {
-    mainNumberElem.textContent = mainNumber.toString();
-  }
-  
-  // --- Menu logic ---
-  const menuButtons = document.querySelectorAll("#menu-selection .menu-btn:not(.locked)");
-  const menuContent = document.getElementById("menu-content");
-  
-  let currentMenu = "Generators";
-  menuButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelector("#menu-selection .menu-btn.selected").classList.remove("selected");
-      btn.classList.add("selected");
-      currentMenu = btn.textContent;
-      if (currentMenu === "Generators") {
-        renderGeneratorsMenu();
-      } else {
-        menuContent.innerHTML = "";
-      }
-    });
-  });
-  
-  // --- Generator 1 UI and logic ---
-  function getGen1Cost() {
-    const costValue = gc(gen1.ab, 1);
-    // Round to avoid floating-point precision issues
-    const roundedCost = Math.round(costValue * 1e12) / 1e12;
-    if (roundedCost < 1e9) {
-      return new MegaNumber(roundedCost, 0, 0);
-    } else {
-      return new MegaNumber(Math.log10(roundedCost), 0, 1);
-    }
-  }
-  function getGen1Multiplier() {
-    // Multiplier is 2^floor(ab/10)
-    return new MegaNumber(Math.pow(2, Math.floor(gen1.ab / 10)), 0, 0);
-  }
-  function canBuyGen1() {
-    const cost = getGen1Cost();
-    return mainNumber.compareTo(cost) >= 0;
-  }
-  function buyGen1() {
-    const cost = getGen1Cost();
-    if (!canBuyGen1()) return;
-    mainNumber = mainNumber.sub(cost);
-    gen1.amount = gen1.amount.add(new MegaNumber(1, 0, 0));
-    gen1.ab += 1;
-    gen1.multiplier = getGen1Multiplier();
-    updateMainNumber();
-    renderGeneratorsMenu();
-  }
-  
-  // Keep track of last render for menu content to support live updates
-  let lastGeneratorsMenuHTML = "";
-  
-  // Render generator(s)
-  function renderGeneratorsMenu() {
-    const cost = getGen1Cost();
-    let html = `
-      <div style="display:flex;align-items:center;gap:1em;">
-        <span>
-          Generator 1: 
-          <strong>${gen1.amount.toString()}</strong>
-          x
-          <strong>${gen1.multiplier.toString()}</strong>
-        </span>
-        <button id="buy-gen1" style="margin-left:2em;">
-          Buy - ${cost.toString()}
-        </button>
-      </div>
-    `;
-    // Only replace innerHTML if changed for efficiency
-    if (menuContent.innerHTML !== html) {
-      menuContent.innerHTML = html;
-    }
-    const buyBtn = document.getElementById("buy-gen1");
-    if (buyBtn) {
-      buyBtn.onclick = () => buyGen1();
-      buyBtn.disabled = !canBuyGen1();
-    }
-    lastGeneratorsMenuHTML = html;
-  }
-  
-  // --- Production loop ---
-  function productionTick(dt) {
-    // Amount * Multiplier / 10 per second
-    const prod = gen1.amount.mul(gen1.multiplier).div(new MegaNumber(10, 0, 0)).mul(new MegaNumber(dt, 0, 0));
-    mainNumber = mainNumber.add(prod);
-    updateMainNumber();
-  }
-  
-  // --- UI update loop for generator buttons ---
-  function uiUpdateLoop() {
-    if (currentMenu === "Generators") {
-      renderGeneratorsMenu();
-    }
-    requestAnimationFrame(uiUpdateLoop);
-  }
-  uiUpdateLoop();
-  
-  // --- Main game loop ---
-  let lastTime = Date.now();
-  function gameLoop() {
-    const now = Date.now();
-    const dt = (now - lastTime) / 1000;
-    lastTime = now;
-    productionTick(dt);
-    requestAnimationFrame(gameLoop);
-  }
+// --- Incremental Game main.js ---
+// Assumes presence of elements:
+// #main-number, #left-string, #menu-content, #menu-selection .menu-btn, etc.
 
-// --- Options Menu Logic ---
+// --- Game State (extend as needed) ---
+let mainNumber = 0;
+let gen1 = 0; // Example generator variable
+
+// --- DOM Elements ---
+const mainNumberElem = document.getElementById("main-number");
+const leftStringElem = document.getElementById("left-string");
+const menuContent = document.getElementById("menu-content");
+const menuButtons = Array.from(document.querySelectorAll("#menu-selection .menu-btn"));
+
+// --- Menu State ---
+let currentMenu = "Generators";
+
+// --- Options Menu State ---
 let deleteClickCount = 0;
-let optionsMenuContent = "";
 
-function saveGame() {
-  localStorage.setItem("incremental-game-save", JSON.stringify({
-    mainNumber,
-    gen1,
-    // add other game state here as needed
-  }));
-  showOptionsMessage("Game saved!");
+// --- Utility Functions ---
+function formatNumber(num) {
+  if (typeof num !== "number") return num;
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
+  return num.toFixed(2);
 }
 
-function deleteSave() {
-  localStorage.removeItem("incremental-game-save");
-  // Optionally reset game state here
-  showOptionsMessage("Save deleted!");
+// --- Game Functions (example logic) ---
+function updateDisplay() {
+  mainNumberElem.textContent = formatNumber(mainNumber);
+  leftStringElem.textContent = `Generators: ${gen1}`;
+}
+
+// --- Menu Rendering ---
+function renderGeneratorsMenu() {
+  menuContent.innerHTML = `
+    <h3>Generators</h3>
+    <div>
+      <span>Generator 1:</span>
+      <span id="gen1-count">${gen1}</span>
+      <button id="buy-gen1">Buy (10)</button>
+    </div>
+  `;
+  document.getElementById("buy-gen1").onclick = () => {
+    if (mainNumber >= 10) {
+      mainNumber -= 10;
+      gen1 += 1;
+      updateDisplay();
+      renderGeneratorsMenu();
+    }
+  };
 }
 
 function showOptionsMessage(msg) {
@@ -184,11 +58,29 @@ function showOptionsMessage(msg) {
   if (msgElem) msgElem.textContent = msg;
   setTimeout(() => {
     if (msgElem) msgElem.textContent = "";
-  }, 2000);
+  }, 1500);
+}
+
+function saveGame() {
+  localStorage.setItem("incremental-game-save", JSON.stringify({
+    mainNumber,
+    gen1,
+    // Add further state here as needed
+  }));
+  showOptionsMessage("Game saved!");
+}
+
+function deleteSave() {
+  localStorage.removeItem("incremental-game-save");
+  mainNumber = 0;
+  gen1 = 0;
+  updateDisplay();
+  showOptionsMessage("Save deleted!");
 }
 
 function renderOptionsMenu() {
-  optionsMenuContent = `
+  menuContent.innerHTML = `
+    <h3>Options</h3>
     <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1em;">
       <button id="save-game-btn">Save Game</button>
       <button id="delete-save-btn">Delete Save (Click 50 times)</button>
@@ -196,32 +88,29 @@ function renderOptionsMenu() {
       <span id="delete-progress" style="font-size:0.9em;color:#ccc;"></span>
     </div>
   `;
-  menuContent.innerHTML = optionsMenuContent;
+  deleteClickCount = 0;
+  const progressElem = document.getElementById("delete-progress");
 
   document.getElementById("save-game-btn").onclick = () => {
     saveGame();
   };
-
-  const deleteBtn = document.getElementById("delete-save-btn");
-  const progressElem = document.getElementById("delete-progress");
-  deleteClickCount = 0;
-  progressElem.textContent = "";
-
-  deleteBtn.onclick = () => {
+  document.getElementById("delete-save-btn").onclick = () => {
     deleteClickCount++;
     progressElem.textContent = `Delete clicks: ${deleteClickCount}/50`;
     if (deleteClickCount >= 50) {
       deleteSave();
       deleteClickCount = 0;
       progressElem.textContent = "";
+      renderOptionsMenu(); // Reset
     }
   };
 }
 
-// In your menu button logic:
+// --- Menu Switching ---
 menuButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelector("#menu-selection .menu-btn.selected").classList.remove("selected");
+    const prevSelected = document.querySelector("#menu-selection .menu-btn.selected");
+    if (prevSelected) prevSelected.classList.remove("selected");
     btn.classList.add("selected");
     currentMenu = btn.textContent;
     if (currentMenu === "Generators") {
@@ -229,12 +118,43 @@ menuButtons.forEach(btn => {
     } else if (currentMenu === "Options") {
       renderOptionsMenu();
     } else {
-      menuContent.innerHTML = "";
+      menuContent.innerHTML = `<h3>${currentMenu}</h3>`;
     }
   });
 });
-  gameLoop();
-  
-  // --- Initial UI ---
-  updateMainNumber();
+
+// --- Load/Save ---
+function loadGame() {
+  const data = localStorage.getItem("incremental-game-save");
+  if (!data) return;
+  try {
+    const save = JSON.parse(data);
+    if (typeof save.mainNumber === "number") mainNumber = save.mainNumber;
+    if (typeof save.gen1 === "number") gen1 = save.gen1;
+    // Add more fields as your game grows
+  } catch (e) {
+    // Corrupt save
+    localStorage.removeItem("incremental-game-save");
+  }
+}
+
+// --- Game Loop Example ---
+function gameTick() {
+  // Example: each generator gives 0.1 per tick
+  mainNumber += gen1 * 0.1;
+  updateDisplay();
+}
+
+// --- Initialization ---
+function init() {
+  loadGame();
+  updateDisplay();
+  // Default to Generators menu
   renderGeneratorsMenu();
+  // Game loop
+  setInterval(gameTick, 100); // 10 ticks per second
+  // Optionally autosave
+  setInterval(saveGame, 30000); // Save every 30 seconds
+}
+
+init();
