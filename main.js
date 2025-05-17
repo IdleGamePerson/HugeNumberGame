@@ -13,8 +13,8 @@ let deleteClickCount = 0;
 
 // --- Display Function ---
 function updateDisplay() {
-  mainNumberElem.textContent = mainNumber.toFixed(2);
-  leftStringElem.textContent = `Generators: ${gen1}`;
+  if (mainNumberElem) mainNumberElem.textContent = mainNumber.toFixed(2);
+  if (leftStringElem) leftStringElem.textContent = `Generators: ${gen1}`;
 }
 
 // --- Generators Menu ---
@@ -22,19 +22,23 @@ function renderGeneratorsMenu() {
   menuContent.innerHTML = `
     <h3>Generators</h3>
     <div>
-      <span>Generator 1:</span>
+      <span>Generator 1: </span>
       <span id="gen1-count">${gen1}</span>
       <button id="buy-gen1">Buy (10)</button>
     </div>
   `;
-  document.getElementById("buy-gen1").onclick = () => {
-    if (mainNumber >= 10) {
-      mainNumber -= 10;
-      gen1 += 1;
-      updateDisplay();
-      renderGeneratorsMenu();
-    }
-  };
+  // Re-attach event handler after rendering
+  const buyBtn = document.getElementById("buy-gen1");
+  if (buyBtn) {
+    buyBtn.onclick = () => {
+      if (mainNumber >= 10) {
+        mainNumber -= 10;
+        gen1 += 1;
+        updateDisplay();
+        renderGeneratorsMenu(); // Re-render to update numbers
+      }
+    };
+  }
 }
 
 // --- Options Menu ---
@@ -85,7 +89,7 @@ function renderOptionsMenu() {
       deleteSave();
       deleteClickCount = 0;
       progressElem.textContent = "";
-      renderOptionsMenu();
+      renderOptionsMenu(); // Reset
     }
   };
 }
@@ -93,16 +97,15 @@ function renderOptionsMenu() {
 // --- Menu Switching ---
 menuButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    // Remove .selected from all
     menuButtons.forEach(b => b.classList.remove("selected"));
     btn.classList.add("selected");
-    // Menu logic by index or text
-    if (btn.textContent.trim() === "Generators") {
+    const text = btn.textContent.trim();
+    if (text === "Generators") {
       renderGeneratorsMenu();
-    } else if (btn.textContent.trim() === "Options") {
+    } else if (text === "Options") {
       renderOptionsMenu();
     } else {
-      menuContent.innerHTML = `<h3>${btn.textContent.trim()}</h3>`;
+      menuContent.innerHTML = `<h3>${text}</h3>`;
     }
   });
 });
@@ -130,6 +133,7 @@ function loadGame() {
 function init() {
   loadGame();
   updateDisplay();
+  // Show Generators menu by default
   renderGeneratorsMenu();
   setInterval(gameTick, 100);
   setInterval(saveGame, 30000);
