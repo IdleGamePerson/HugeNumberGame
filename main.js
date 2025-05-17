@@ -6,7 +6,8 @@ const menuButtons = Array.from(document.querySelectorAll("#menu-selection .menu-
 
 // --- Game State ---
 let mainNumber = 0;
-let gen1 = 0;
+let gen1 = 0;        // amount owned
+let gen1Bought = 0;  // amount bought (for cost calculation)
 
 // Generator 1 constants
 const GEN1_BASE_COST = 10;
@@ -25,13 +26,18 @@ function formatNumber(num) {
   return num.toFixed(2);
 }
 
-function getGen1Cost() {
-  // Cost = base * (multiplier^count)
-  return Math.floor(GEN1_BASE_COST * Math.pow(GEN1_COST_MULT, gen1));
+// Cost function: gc(floor(ab/10), 1)
+function gc(tier, base) {
+  // Example: cost = base * 10 * (1.15^tier)
+  // You can adjust this formula as needed
+  return Math.floor(base * 10 * Math.pow(GEN1_COST_MULT, tier));
 }
-
+function getGen1Cost() {
+  // ab = gen1Bought
+  const tier = Math.floor(gen1Bought / 10);
+  return gc(tier, 1);
+}
 function getGen1Multiplier() {
-  // For example, could scale with upgrades, but here it's constant
   return GEN1_PROD_PER;
 }
 
@@ -50,6 +56,7 @@ function renderGeneratorsMenu() {
     <div>
       <span>Generator 1: </span>
       <span id="gen1-count">${gen1}</span><br>
+      <span>Bought: <b>${gen1Bought}</b></span><br>
       <span>Multiplier: <b>${formatNumber(gen1Mult)}</b> / tick</span><br>
       <span>Next cost: <b>${formatNumber(gen1Cost)}</b></span><br>
       <button id="buy-gen1" ${mainNumber < gen1Cost ? "disabled" : ""}>Buy (${formatNumber(gen1Cost)})</button>
@@ -63,6 +70,7 @@ function renderGeneratorsMenu() {
       if (mainNumber >= cost) {
         mainNumber -= cost;
         gen1 += 1;
+        gen1Bought += 1;
         updateDisplay();
         renderGeneratorsMenu(); // Re-render to update numbers and button state
       }
@@ -83,6 +91,7 @@ function saveGame() {
   localStorage.setItem("incremental-game-save", JSON.stringify({
     mainNumber,
     gen1,
+    gen1Bought,
   }));
   showOptionsMessage("Game saved!");
 }
@@ -91,6 +100,7 @@ function deleteSave() {
   localStorage.removeItem("incremental-game-save");
   mainNumber = 0;
   gen1 = 0;
+  gen1Bought = 0;
   updateDisplay();
   showOptionsMessage("Save deleted!");
 }
@@ -153,6 +163,7 @@ function loadGame() {
     const save = JSON.parse(data);
     if (typeof save.mainNumber === "number") mainNumber = save.mainNumber;
     if (typeof save.gen1 === "number") gen1 = save.gen1;
+    if (typeof save.gen1Bought === "number") gen1Bought = save.gen1Bought;
   } catch (e) {
     localStorage.removeItem("incremental-game-save");
   }
