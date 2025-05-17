@@ -8,7 +8,46 @@
   --menu-btn-count: 29;
   --button-margin: 0.1vh;
 }
-  
+
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #1e1e2f;
+  color: #fff;
+  /* Prevent scrolling */
+  overflow: hidden;
+}
+
+#game-area {
+  display: flex;
+  height: var(--game-area-height);
+  /* Prevent child overflow */
+  overflow: hidden;
+}
+
+#menu-selection {
+  width: var(--menu-width);
+  height: 100%;
+  background: #232343;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-top: 0; /* or your preferred value */
+  gap: 0;
+  /* Prevent scrolling */
+  overflow: hidden;
+}
+
+#menu-content {
+  width: var(--content-width);
+  background: #222233;
+  height: 100%;
+  padding: 2vw;
+  box-sizing: border-box;
+  overflow: hidden;     /* Prevent scrolling here too */
+}
   html, body {
     height: 100%;
     padding: 0;
