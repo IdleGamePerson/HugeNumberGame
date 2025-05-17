@@ -75,6 +75,8 @@
   #game-area {
     display: flex;
     height: var(--game-area-height);
+   /* Prevent overflow from #menu-selection affecting #game-area */
+    overflow: hidden;
   }
   
  #menu-selection {
@@ -84,8 +86,26 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding-top: 2vh;
-  gap: 0.5vh;
+  /* Remove gap for tight fit */
+  padding-top: 0;
+  gap: 0;
+  /* Add independent vertical scroll */
+  overflow-y: auto;
+  /* Optional: hide scrollbar for cleaner look (still scrollable with mouse wheel) */
+  scrollbar-width: thin;
+  scrollbar-color: #444 #232343;
+}
+
+/* Optional: For Webkit browsers (Chrome, Edge, Safari) */
+#menu-selection::-webkit-scrollbar {
+  width: 8px;
+}
+#menu-selection::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+#menu-selection::-webkit-scrollbar-track {
+  background: #232343;
 }
 
 .menu-btn {
