@@ -9,24 +9,81 @@
   --button-margin: 0.1vh;
 }
 
+/* Reset and base styles */
 html, body {
   height: 100%;
-  padding: 0;
   margin: 0;
+  padding: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #1e1e2f;
   color: #fff;
-  /* Prevent scrolling */
-  overflow: hidden;
+  overflow: hidden; /* Prevent all scrolling */
 }
 
+/* News Ticker */
+#news-ticker {
+  height: var(--news-height);
+  width: 100vw;
+  background: #222244;
+  display: flex;
+  align-items: center;
+  padding-left: 2vw;
+  font-size: 1.2em;
+  border-bottom: 2px solid #444;
+}
+
+/* Main Display Row */
+#main-display {
+  height: var(--main-display-height);
+  display: flex;
+  width: 100vw;
+  border-bottom: 2px solid #333;
+}
+
+#left-textbox {
+  width: 30vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #232343;
+  min-height: 100%;
+  box-sizing: border-box;
+  border-right: 2px solid #333;
+}
+
+#left-string {
+  display: block;
+  width: 85%;
+  min-height: 2em;
+  background: #181830;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 5px;
+  font-size: 1.1em;
+  padding: 0.5em 1em;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+#right-number {
+  width: 70vw;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 5vw;
+  background: #232350;
+  font-size: 2.2em;
+  font-weight: bold;
+}
+
+/* Game Area */
 #game-area {
   display: flex;
   height: var(--game-area-height);
-  /* Prevent child overflow */
-  overflow: hidden;
+  overflow: hidden; /* Prevent children from overflowing */
 }
 
+/* Menu Selection (sidebar) */
 #menu-selection {
   width: var(--menu-width);
   height: 100%;
@@ -34,135 +91,30 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding-top: 0; /* or your preferred value */
-  gap: 0;
-  /* Prevent scrolling */
-  overflow: hidden;
-}
-
-#menu-content {
-  width: var(--content-width);
-  background: #222233;
-  height: 100%;
-  padding: 2vw;
-  box-sizing: border-box;
-  overflow: hidden;     /* Prevent scrolling here too */
-}
-  html, body {
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #1e1e2f;
-    color: #fff;
-  }
-  
-  #news-ticker {
-    height: var(--news-height);
-    width: 100vw;
-    background: #222244;
-    display: flex;
-    align-items: center;
-    padding-left: 2vw;
-    font-size: 1.2em;
-    border-bottom: 2px solid #444;
-  }
-  
-  #main-display {
-    height: var(--main-display-height);
-    display: flex;
-    width: 100vw;
-    border-bottom: 2px solid #333;
-  }
-  
-  #left-textbox {
-    width: 30vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #232343;
-    min-height: 100%;
-    box-sizing: border-box;
-    border-right: 2px solid #333;
-  }
-  
-  #left-string {
-    display: block;
-    width: 85%;
-    min-height: 2em;
-    background: #181830;
-    color: #fff;
-    border: 1px solid #333;
-    border-radius: 5px;
-    font-size: 1.1em;
-    padding: 0.5em 1em;
-    box-sizing: border-box;
-    text-align: left;
-  }
-  
-  #right-number {
-    width: 70vw;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 5vw;
-    background: #232350;
-    font-size: 2.2em;
-    font-weight: bold;
-  }
-  
-  #game-area {
-    display: flex;
-    height: var(--game-area-height);
-   /* Prevent overflow from #menu-selection affecting #game-area */
-    overflow: hidden;
-  }
-  
- #menu-selection {
-  width: var(--menu-width);
-  height: 90%;
-  background: #232343;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  /* Remove gap for tight fit */
   padding-top: 0;
   gap: 0;
-  /* Add independent vertical scroll */
-  overflow-y: auto;
-  /* Optional: hide scrollbar for cleaner look (still scrollable with mouse wheel) */
-  scrollbar-width: thin;
-  scrollbar-color: #444 #232343;
+  overflow: hidden; /* No scroll, force all buttons to fit */
 }
 
-/* Optional: For Webkit browsers (Chrome, Edge, Safari) */
-#menu-selection::-webkit-scrollbar {
-  width: 8px;
-}
-#menu-selection::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 4px;
-}
-#menu-selection::-webkit-scrollbar-track {
-  background: #232343;
-}
-
+/* Menu Button Sizing */
 .menu-btn {
-  /* Calculate height so all buttons fit without overflow */
-  /* Total available height: 100% minus (number of gaps * margin) */
   height: calc((100% - (var(--menu-btn-count) - 1) * var(--button-margin)) / var(--menu-btn-count));
-  margin-bottom: 1px
+  margin-bottom: var(--button-margin);
   background: #2e2e47;
   color: #fff;
   border: none;
-  border-radius: 0px;
+  border-radius: 0;
   font-size: 0.8em;
   cursor: pointer;
   opacity: 1;
   transition: background 0.2s, color 0.2s;
-  min-height: 0; /* Prevent button from stretching if content is small */
-  padding: 0.2em 0.3em; /* Reduce vertical padding */
+  min-height: 0;
+  padding: 0.2em 0.3em;
   box-sizing: border-box;
+  /* Prevent selection from breaking layout */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .menu-btn:last-child { margin-bottom: 0; }
 .menu-btn.selected {
@@ -176,42 +128,43 @@ html, body {
   opacity: 0.5;
   cursor: not-allowed;
 }
-  
-  #menu-content {
-    width: var(--content-width);
-    background: #222233;
-    height: 100%;
-    padding: 2vw;
-    box-sizing: border-box;
-    overflow-y: auto;
-  }
-  
-  #actions-row {
-    height: var(--actions-row-height);
-    display: flex;
-    justify-content: stretch;
-    align-items: center;
-    gap: 0;
-    background: #19192b;
-    border-bottom: 2px solid #333;
-  }
-  
-  .action-btn {
-    flex: 1 1 0;
-    width: 100%;
-    height: 100%;
-    font-size: 1.3em;
-    border: none;
-    border-radius: 0;
-    color: #fff;
-    opacity: 0.6;
-    cursor: not-allowed;
-    transition: box-shadow 0.2s;
-    margin: 0;
-  }
-  
-  .action-btn.orange { background: #ff9800; }
-  .action-btn.purple { background: #b266ff; }
-  .action-btn.black { background: #222; }
-  .action-btn.green { background: #25c425; }
-  .action-btn.blue { background: #2196f3; }
+
+/* Menu Content */
+#menu-content {
+  width: var(--content-width);
+  height: 100%;
+  background: #222233;
+  padding: 2vw;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Actions Row */
+#actions-row {
+  height: var(--actions-row-height);
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  gap: 0;
+  background: #19192b;
+  border-bottom: 2px solid #333;
+}
+
+.action-btn {
+  flex: 1 1 0;
+  width: 100%;
+  height: 100%;
+  font-size: 1.3em;
+  border: none;
+  border-radius: 0;
+  color: #fff;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transition: box-shadow 0.2s;
+  margin: 0;
+}
+.action-btn.orange { background: #ff9800; }
+.action-btn.purple { background: #b266ff; }
+.action-btn.black { background: #222; }
+.action-btn.green { background: #25c425; }
+.action-btn.blue { background: #2196f3; }
