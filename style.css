@@ -91,7 +91,7 @@
 .menu-btn {
   /* Calculate height so all buttons fit without overflow */
   /* Total available height: 100% minus (number of gaps * margin) */
-  height: calc((100% - (var(--menu-btn-count) - 1) * var(--button-margin)) / var(--menu-btn-count));
+  height: 2%;
   margin-bottom: var(--button-margin);
   background: #2e2e47;
   color: #fff;
