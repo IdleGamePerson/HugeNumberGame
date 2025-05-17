@@ -96,8 +96,8 @@
   background: #2e2e47;
   color: #fff;
   border: none;
-  border-radius: 5px;
-  font-size: 0.9em;
+  border-radius: 0px;
+  font-size: 0.8em;
   cursor: pointer;
   opacity: 1;
   transition: background 0.2s, color 0.2s;
