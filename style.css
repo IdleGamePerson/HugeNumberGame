@@ -1,13 +1,13 @@
 :root {
-    --news-height: 5vh;
-    --main-display-height: 10vh;
-    --actions-row-height: 3vh;
-    --game-area-height: 82vh;
-    --menu-width: 10vw;
-    --content-width: 90vw;
-    --button-height: 2.5vh;
-    --button-margin: 0.3vh;
-  }
+  --news-height: 5vh;
+  --main-display-height: 10vh;
+  --actions-row-height: 3vh;
+  --game-area-height: 82vh;
+  --menu-width: 10vw;
+  --content-width: 90vw;
+  --menu-btn-count: 29;
+  --button-margin: 0.3vh;
+}
   
   html, body {
     height: 100%;
@@ -91,7 +91,7 @@
 .menu-btn {
   /* Calculate height so all buttons fit without overflow */
   /* Total available height: 100% minus (number of gaps * margin) */
-  height: calc((90% - (var(--menu-btn-count) - 1) * var(--button-margin)) / var(--menu-btn-count));
+  height: calc((100% - (var(--menu-btn-count) - 1) * var(--button-margin)) / var(--menu-btn-count));
   margin-bottom: var(--button-margin);
   background: #2e2e47;
   color: #fff;
