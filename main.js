@@ -1,39 +1,23 @@
-// --- Incremental Game main.js ---
-// Assumes presence of elements:
-// #main-number, #left-string, #menu-content, #menu-selection .menu-btn, etc.
-
-// --- Game State (extend as needed) ---
-let mainNumber = 0;
-let gen1 = 0; // Example generator variable
-
 // --- DOM Elements ---
 const mainNumberElem = document.getElementById("main-number");
 const leftStringElem = document.getElementById("left-string");
 const menuContent = document.getElementById("menu-content");
 const menuButtons = Array.from(document.querySelectorAll("#menu-selection .menu-btn"));
 
-// --- Menu State ---
-let currentMenu = "Generators";
+// --- Game State ---
+let mainNumber = 0;
+let gen1 = 0;
 
-// --- Options Menu State ---
+// --- Options State ---
 let deleteClickCount = 0;
 
-// --- Utility Functions ---
-function formatNumber(num) {
-  if (typeof num !== "number") return num;
-  if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
-  if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
-  if (num >= 1e3) return (num / 1e3).toFixed(2) + "K";
-  return num.toFixed(2);
-}
-
-// --- Game Functions (example logic) ---
+// --- Display Function ---
 function updateDisplay() {
-  mainNumberElem.textContent = formatNumber(mainNumber);
+  mainNumberElem.textContent = mainNumber.toFixed(2);
   leftStringElem.textContent = `Generators: ${gen1}`;
 }
 
-// --- Menu Rendering ---
+// --- Generators Menu ---
 function renderGeneratorsMenu() {
   menuContent.innerHTML = `
     <h3>Generators</h3>
@@ -53,6 +37,7 @@ function renderGeneratorsMenu() {
   };
 }
 
+// --- Options Menu ---
 function showOptionsMessage(msg) {
   const msgElem = document.getElementById("options-message");
   if (msgElem) msgElem.textContent = msg;
@@ -65,7 +50,6 @@ function saveGame() {
   localStorage.setItem("incremental-game-save", JSON.stringify({
     mainNumber,
     gen1,
-    // Add further state here as needed
   }));
   showOptionsMessage("Game saved!");
 }
@@ -101,7 +85,7 @@ function renderOptionsMenu() {
       deleteSave();
       deleteClickCount = 0;
       progressElem.textContent = "";
-      renderOptionsMenu(); // Reset
+      renderOptionsMenu();
     }
   };
 }
@@ -109,19 +93,25 @@ function renderOptionsMenu() {
 // --- Menu Switching ---
 menuButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    const prevSelected = document.querySelector("#menu-selection .menu-btn.selected");
-    if (prevSelected) prevSelected.classList.remove("selected");
+    // Remove .selected from all
+    menuButtons.forEach(b => b.classList.remove("selected"));
     btn.classList.add("selected");
-    currentMenu = btn.textContent;
-    if (currentMenu === "Generators") {
+    // Menu logic by index or text
+    if (btn.textContent.trim() === "Generators") {
       renderGeneratorsMenu();
-    } else if (currentMenu === "Options") {
+    } else if (btn.textContent.trim() === "Options") {
       renderOptionsMenu();
     } else {
-      menuContent.innerHTML = `<h3>${currentMenu}</h3>`;
+      menuContent.innerHTML = `<h3>${btn.textContent.trim()}</h3>`;
     }
   });
 });
+
+// --- Game Loop Example ---
+function gameTick() {
+  mainNumber += gen1 * 0.1;
+  updateDisplay();
+}
 
 // --- Load/Save ---
 function loadGame() {
@@ -131,30 +121,17 @@ function loadGame() {
     const save = JSON.parse(data);
     if (typeof save.mainNumber === "number") mainNumber = save.mainNumber;
     if (typeof save.gen1 === "number") gen1 = save.gen1;
-    // Add more fields as your game grows
   } catch (e) {
-    // Corrupt save
     localStorage.removeItem("incremental-game-save");
   }
-}
-
-// --- Game Loop Example ---
-function gameTick() {
-  // Example: each generator gives 0.1 per tick
-  mainNumber += gen1 * 0.1;
-  updateDisplay();
 }
 
 // --- Initialization ---
 function init() {
   loadGame();
   updateDisplay();
-  // Default to Generators menu
   renderGeneratorsMenu();
-  // Game loop
-  setInterval(gameTick, 100); // 10 ticks per second
-  // Optionally autosave
-  setInterval(saveGame, 30000); // Save every 30 seconds
+  setInterval(gameTick, 100);
+  setInterval(saveGame, 30000);
 }
-
 init();
